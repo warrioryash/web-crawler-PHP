@@ -1,0 +1,36 @@
+On Ubuntu 16.04:
+
+1. INSTALL CURL
+   sudo apt-get install curl -y
+
+2. INSTALL PHP
+   apt-get install php7.0-cli php7.0 php7.0-fpm php7.0-mysql php-curl php-xml -y
+
+3. INSTALL MySQL/MariaDB (remember to replace YOURPASSWD)
+   sudo apt-get install mariadb-server mariadb-client -y
+   sudo mysql -u root <<-EOF
+   use mysql;
+   update user set plugin='' where User='root';
+   flush privileges;
+   UPDATE mysql.user SET Password=PASSWORD('YOURPASSWD') WHERE User='root';
+   DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+   DELETE FROM mysql.user WHERE User='';
+   DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';
+   FLUSH PRIVILEGES;
+   EOF
+
+4. Run these commands from within MySQL to create the database and the stored procedure. 
+   Launch terminal and run MySQL from the same directory as the .sql files:
+   source createDatabase.sql
+   source storedProcedure.sql
+
+5. Create the MySQL user, "crawler". First log into MySQL
+   mysql -u root -p
+   use mysql;
+   INSERT INTO user (Host,User,Password) VALUES('%','crawler',PASSWORD('crawl123'));
+   flush privileges;
+
+5. From the commandline, run the script:
+   php crawl.php www.domainname.com
+
+6. From the web, launch index.php and input the domains to crawl.
